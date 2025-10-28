@@ -1,0 +1,14 @@
+{
+  "name": "monsey-trails-service-log",
+  "version": "2.2.1a",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.7",
+    "body-parser": "^1.20.2"
+  }
+}

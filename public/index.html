@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Monsey Trails – Service Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#E6FF57;--text:#0f172a;--muted:#64748b;--card:#fff;--bg:#f8fafc}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+h1{font-size:20px;margin:0}.badge{background:var(--brand);color:#000;border-radius:999px;padding:2px 8px;font-size:12px;margin-left:6px}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:16px}
+.card h2{margin:0;padding:14px 16px;border-bottom:1px solid #eef2f7;font-size:16px}
+.card .content{padding:16px}
+.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.row-5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media(max-width:900px){.row,.row-5{grid-template-columns:1fr}}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}
+textarea{resize:vertical}.actions{display:flex;gap:8px;align-items:center}
+button{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+button.primary{background:var(--brand);color:#000;border-color:var(--brand);font-weight:700}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eef2f7;text-align:left;font-size:14px;vertical-align:top}
+th{background:#f8fafc;font-weight:600}.muted{color:var(--muted)}.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;cursor:pointer}
+.tab.active{background:var(--brand);color:#000;border-color:var(--brand);font-weight:700}
+.right{display:flex;gap:8px;align-items:center}.nowrap{white-space:nowrap}.truncate{max-width:38ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:8px}
+.logo-wrap img{max-width:360px;width:100%;height:auto;display:block;object-fit:contain}
+@media print{.tabs,#signOutBtn,.actions,.card h2{display:none!important}td,th{white-space:normal!important}.truncate{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div><h1>🔧 Monsey Trails • Service Log <span class="badge">Online</span></h1><div id="signedAs" class="muted" style="font-size:12px;"></div></div>
+    <div class="right"><button id="signOutBtn" style="display:none">Sign Out</button></div>
+  </header>
+
+  <div id="loginCard" class="card">
+    <h2>Sign In</h2>
+    <div class="content">
+      <div class="logo-wrap"><img src="logo.png" alt="Monsey Trails Logo" onerror="this.style.display='none'"><div class="muted" style="margin-top:6px;font-weight:600">Monsey Trails – Service Log</div></div>
+      <div class="row">
+        <div><label>Name</label><select id="loginName"></select></div>
+        <div><label>4-Digit PIN</label><input id="loginPin" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+        <div class="actions" style="align-items:flex-end"><button class="primary" id="loginBtn">Sign In</button></div>
+      </div>
+      <p class="muted" style="font-size:12px;margin-top:8px">First time: enter a PIN to set it. Admins can add names in <b>Admin</b> tab.</p>
+    </div>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="tabs">
+      <button class="tab active" data-tab="new">New Entry</button>
+      <button class="tab" data-tab="dashboard">Dashboard</button>
+      <button class="tab adminOnly" data-tab="weekly" style="display:none">Weekly</button>
+      <button class="tab adminOnly" data-tab="admin" style="display:none">Admin</button>
+      <button class="tab" data-tab="help">Help</button>
+    </div>
+
+    <section id="tab-new">
+      <div class="card"><h2>Add Service Entry</h2><div class="content">
+        <div class="row">
+          <div><label>Start Time</label><input id="fStart" type="datetime-local"></div>
+          <div><label>Finish Time</label><input id="fEnd" type="datetime-local"></div>
+          <div><label>Bus #</label><select id="fBus"></select></div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div><label>Service Type</label><select id="fType"></select></div>
+          <div><label>Odometer</label><input id="fOdo" inputmode="numeric"></div>
+          <div><label>Photos (names only)</label><input id="fPhotos" type="file" multiple></div>
+        </div>
+        <div style="margin-top:8px"><label>Service Notes</label><textarea id="fNotes" rows="3"></textarea></div>
+        <div class="card" style="margin-top:12px"><h2>Parts Used</h2><div class="content" id="partsWrap"></div><div class="content actions"><button id="addPartBtn">+ Add Part</button></div></div>
+        <div class="actions" style="margin-top:12px"><button class="primary" id="saveBtn">Save Entry</button><button id="clearBtn">Clear</button></div>
+      </div></div>
+    </section>
+
+    <section id="tab-dashboard" style="display:none">
+      <div class="card"><h2>Filters</h2><div class="content">
+        <div class="row-5">
+          <div><label>From</label><input id="fltFrom" type="datetime-local"></div>
+          <div><label>To</label><input id="fltTo" type="datetime-local"></div>
+          <div><label>Bus</label><select id="fltBus"></select></div>
+          <div><label>Mechanic</label><select id="fltMech"></select></div>
+          <div><label>Service Type</label><select id="fltType"></select></div>
+        </div>
+        <div class="actions" style="margin-top:8px"><button id="resetFilters">Reset</button><button id="applyFilters">Apply</button><button id="printBtn">Print</button></div>
+      </div></div>
+
+      <div class="card"><h2>Entries (<span id="entriesCount">0</span>)</h2><div class="content" style="overflow:auto">
+        <table><thead><tr><th>Start</th><th>Finish</th><th>Hours</th><th>Bus</th><th>Type</th><th>Mechanic</th><th>Odo</th><th>Parts ($)</th><th>Parts Detail</th><th>Description</th><th class="nowrap">Actions</th></tr></thead><tbody id="rows"></tbody></table>
+      </div></div>
+
+      <div class="row">
+        <div class="card"><h2>Total Hours</h2><div class="content"><div id="sumHours" style="font-size:26px;font-weight:700">0.00</div></div></div>
+        <div class="card"><h2>Parts Cost</h2><div class="content"><div id="sumParts" style="font-size:26px;font-weight:700">$0.00</div></div></div>
+        <div class="card"><h2>Entries</h2><div class="content"><div id="sumEntries" style="font-size:26px;font-weight:700">0</div></div></div>
+      </div>
+    </section>
+
+    <section id="tab-weekly" style="display:none">
+      <div class="card"><h2>Weekly Performance</h2><div class="content">
+        <div class="muted" id="weekRange" style="margin-bottom:8px"></div>
+        <canvas id="weeklyChart" height="160"></canvas>
+        <div style="overflow:auto;margin-top:12px"><table id="weeklyTable"><thead><tr><th>Mechanic</th><th>Entries</th><th>Hours</th><th>Parts $</th><th>Flag</th></tr></thead><tbody id="weeklyBody"></tbody></table></div>
+        <div class="actions" style="margin-top:12px"><button id="weeklyPdfBtn">Download Weekly PDF</button></div>
+      </div></div>
+    </section>
+
+    <section id="tab-admin" style="display:none">
+      <div class="card"><h2>Admin Security</h2><div class="content row">
+        <div><label>Your Admin PIN</label><input id="adminPin" type="password" maxlength="4" inputmode="numeric" placeholder="****"></div>
+        <div style="grid-column:span 2"><label>Add User</label><div class="actions"><input id="newUserName" placeholder="Full name" style="flex:1"><select id="newUserRole"><option value="mechanic">Mechanic</option><option value="admin">Admin</option></select><button id="addUserBtn">Add</button></div></div>
+      </div></div>
+
+      <div class="card"><h2>Users</h2><div class="content" style="overflow:auto">
+        <table><thead><tr><th>Name</th><th>Role</th><th>PIN Set?</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table>
+      </div></div>
+    </section>
+
+    <section id="tab-help" style="display:none">
+      <div class="card"><h2>How to Use</h2><div class="content"><ol>
+        <li>Sign in with your <b>Name</b> and a <b>4-digit PIN</b>.</li>
+        <li><b>New Entry:</b> add Start/Finish time, Bus, Type, Odo, Notes, Parts.</li>
+        <li><b>Dashboard:</b> set filters and click <b>Apply</b>. Use <b>Print</b> for a detailed paper report.</li>
+        <li><b>Weekly (admin):</b> see hours/parts per mechanic + flags. Printable.</li>
+        <li><b>Admin:</b> add/remove/rename users and reset PINs.</li>
+      </ol></div></div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const SERVICE=["Inspection","Oil Change","Brakes","Tires","HVAC","Electrical","Bodywork","Engine/DPF","Transmission","Suspension","Road Call","Other","Cleaning","Washing the bus","Fueling"];
+const BUS=[7701,7702,7703,7704,7705,7706,7707,7708,7709,7710,7711,7712,7713,7714,7718,7719,7720,7721,7722,7723,7724,7725,7729,9901,9902,9903,9904,9905,9906,9907,9908,9909,9910,9911,9912,9913,9914,9915,9916,9917,9918,9919,9920,9921,9922,9923,9924,9925,9926].map(String);
+const $=s=>document.querySelector(s); const fmtMoney=n=>(Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD'});
+let session=null; function api(p,o){return fetch(p,{headers:{'Content-Type':'application/json'},...o}).then(r=>r.ok?r.json():r.json().then(e=>Promise.reject(e)));}
+function fill(el,arr,any=false){el.innerHTML=''; if(any){const o=document.createElement('option');o.value='';o.textContent='Any';el.appendChild(o);} arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});}
+fill($('#fBus'),BUS); fill($('#fType'),SERVICE); fill($('#fltBus'),BUS,true); fill($('#fltType'),SERVICE,true);
+const pad=n=>String(n).padStart(2,'0'); const loc=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; const isoToLocal=s=>{if(!s)return'';const d=new Date(s);const z=d.getTimezoneOffset();return new Date(d.getTime()-z*60000).toISOString().slice(0,16);};
+$('#fStart').value=loc(new Date()); $('#fEnd').value=loc(new Date(Date.now()+3600000));
+function refreshLogin(){api('/api/users').then(list=>{$('#loginName').innerHTML='';list.forEach(u=>{const o=document.createElement('option');o.value=u.name;o.textContent=u.name;$('#loginName').appendChild(o);});});} refreshLogin();
+$('#loginPin').oninput=()=> $('#loginPin').value=String($('#loginPin').value||'').replace(/\D/g,'').slice(0,4);
+$('#loginBtn').onclick=()=>{const name=$('#loginName').value; const pin=$('#loginPin').value; if(!name||pin.length!==4)return alert('Enter name + 4-digit PIN');
+  api('/api/login',{method:'POST',body:JSON.stringify({name,pin})}).then(r=>{session=r.user; $('#loginCard').style.display='none'; $('#app').style.display='block'; $('#signOutBtn').style.display='inline-flex'; $('#signedAs').innerHTML='Signed in as <b>'+session.name+'</b> ('+session.role+')'; document.querySelectorAll('.adminOnly').forEach(el=> el.style.display=session.role==='admin'?'':'none'); refreshFilters(); render(); renderUsers();}).catch(e=>alert(e.error||'Login failed'));};
+$('#signOutBtn').onclick=()=>{session=null; $('#app').style.display='none'; $('#loginCard').style.display='block'; $('#signOutBtn').style.display='none'; $('#signedAs').innerHTML='';};
+function refreshFilters(){ api('/api/entries?name='+(session?.name||'')+'&role='+(session?.role||'')) .then(rows=>{ const mechs=[...new Set(rows.map(e=>e.mechanic).filter(Boolean))].sort(); const s=$('#fltMech'); s.innerHTML='<option value=\"\">Any</option>'+mechs.map(m=>'<option>'+m+'</option>').join(''); }); }
+$('#resetFilters').onclick=()=>{$('#fltFrom').value='';$('#fltTo').value='';$('#fltBus').value='';$('#fltMech').value='';$('#fltType').value='';render();}; $('#applyFilters').onclick=()=>render(); $('#printBtn').onclick=()=>window.print();
+function rowPart(p){const w=document.createElement('div');w.className='row';w.style.marginBottom='8px';w.innerHTML='<div><label>Part #</label><input class=\"partNo\" value=\"'+(p?.partNo||'')+'\"></div><div><label>Description</label><input class=\"partDesc\" value=\"'+(p?.desc||'')+'\"></div><div><label>Qty</label><input class=\"partQty\" inputmode=\"decimal\" value=\"'+(p?.qty||'')+'\"></div><div><label>Unit Cost ($)</label><input class=\"partUnit\" inputmode=\"decimal\" value=\"'+(p?.unit||'')+'\"></div>'; return w;}
+$('#partsWrap').appendChild(rowPart()); $('#addPartBtn').onclick=()=> $('#partsWrap').appendChild(rowPart());
+document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); b.classList.add('active'); const k=b.dataset.tab; ['new','dashboard','admin','weekly','help'].forEach(id=> $('#tab-'+id).style.display=id===k?'block':'none'); if(k==='weekly'&&session?.role==='admin') renderWeekly(); if(k==='admin'&&session?.role==='admin') renderUsers();});
+function qs(){const q=new URLSearchParams(); q.set('name',session.name); q.set('role',session.role); const g=id=>$('#'+id).value; if(g('fltFrom'))q.set('from',g('fltFrom')); if(g('fltTo'))q.set('to',g('fltTo')); if(g('fltBus'))q.set('bus',g('fltBus')); if(g('fltMech'))q.set('mech',g('fltMech')); if(g('fltType'))q.set('type',g('fltType')); return q.toString();}
+function fetchEntries(){return api('/api/entries?'+qs());}
+function clearForm(){ const now=new Date(); $('#fStart').value=loc(now); $('#fEnd').value=loc(new Date(now.getTime()+3600000)); $('#fBus').value=''; $('#fType').value=SERVICE[0]; $('#fOdo').value=''; $('#fNotes').value=''; $('#fPhotos').value=''; $('#partsWrap').innerHTML=''; $('#partsWrap').appendChild(rowPart()); delete $('#saveBtn').dataset.editId; } $('#clearBtn').onclick=clearForm;
+$('#saveBtn').onclick=()=>{ if(!session)return alert('Please sign in.'); if(!$('#fBus').value)return alert('Select a bus number.'); const entry={ id: $('#saveBtn').dataset.editId || (Date.now().toString(36)+Math.random().toString(36).slice(2,8)), startTime:$('#fStart').value, endTime:$('#fEnd').value, date:$('#fStart').value, mechanic:session.name, bus:$('#fBus').value, serviceType:$('#fType').value, odometer:$('#fOdo').value, notes:$('#fNotes').value, parts:[...$('#partsWrap').querySelectorAll('.row')].map(w=>({partNo:w.querySelector('.partNo').value,desc:w.querySelector('.partDesc').value,qty:w.querySelector('.partQty').value,unit:w.querySelector('.partUnit').value})), photos:Array.from($('#fPhotos').files||[]).map(f=>f.name)}; api('/api/entries',{method:'POST',body:JSON.stringify(entry)}).then(()=>{clearForm();render();}).catch(e=>alert(e.error||'Save failed'));};
+function render(){ fetchEntries().then(data=>{ const rows=$('#rows'); rows.innerHTML=''; $('#entriesCount').textContent=data.length; data.forEach(e=>{ const partsTotal=(e.parts||[]).reduce((a,p)=>a+(Number(p.qty)||0)*(Number(p.unit)||0),0); const partsDetail=(e.parts||[]).map(p=>`${p.partNo||''} x${p.qty||0} @ ${p.unit||0}`).join('; '); const hours=Number(e.durationHours||0); const tr=document.createElement('tr'); tr.innerHTML='<td class=\"nowrap\">'+(e.startTime?new Date(e.startTime).toLocaleString():'')+'</td><td class=\"nowrap\">'+(e.endTime?new Date(e.endTime).toLocaleString():'')+'</td><td>'+hours.toFixed(2)+'</td><td>'+e.bus+'</td><td>'+e.serviceType+'</td><td>'+e.mechanic+'</td><td>'+(e.odometer||'')+'</td><td>'+fmtMoney(partsTotal)+'</td><td>'+(partsDetail||'')+'</td><td>'+(e.notes||'')+'</td><td class=\"nowrap\"></td>'; const act=tr.lastElementChild; const view=document.createElement('button'); view.textContent='View'; view.onclick=()=>openDetail(e); act.appendChild(view); const edit=document.createElement('button'); edit.textContent='Edit'; edit.style.marginLeft='6px'; edit.onclick=()=>loadIntoForm(e); act.appendChild(edit); if(session?.role==='admin'){ const del=document.createElement('button'); del.textContent='Delete'; del.style.marginLeft='6px'; del.onclick=()=>{ if(confirm('Delete this entry?')) api('/api/entries/'+e.id,{method:'DELETE'}).then(render); }; act.appendChild(del);} rows.appendChild(tr); }); }).then(()=> fetchEntries().then(data=>{ const hours=data.reduce((a,b)=>a+(Number(b.durationHours)||0),0); const parts=data.reduce((a,b)=>a+(b.parts||[]).reduce((x,p)=>x+(Number(p.qty)||0)*(Number(p.unit)||0),0),0); $('#sumHours').textContent=hours.toFixed(2); $('#sumParts').textContent=fmtMoney(parts); $('#sumEntries').textContent=data.length; })); }
+function loadIntoForm(e){ $('#fStart').value=isoToLocal(e.startTime||e.date); $('#fEnd').value=isoToLocal(e.endTime); $('#fBus').value=e.bus; $('#fType').value=e.serviceType; $('#fOdo').value=e.odometer||''; $('#fNotes').value=e.notes||''; const w=$('#partsWrap'); w.innerHTML=''; (e.parts||[]).forEach(p=> w.appendChild(rowPart(p))); if((e.parts||[]).length===0) w.appendChild(rowPart()); $('#saveBtn').dataset.editId=e.id; window.scrollTo({top:0,behavior:'smooth'}); }
+async function renderUsers(){ if(!session||session.role!=='admin') return; const list=await api('/api/users'); const tb=$('#usersBody'); if(!tb) return; tb.innerHTML=''; list.forEach(u=>{ const tr=document.createElement('tr'); tr.innerHTML='<td>'+u.name+'</td><td>'+u.role+'</td><td>'+(u.pinSet?'Yes':'No')+'</td><td class=\"actions\"></td>'; const act=tr.lastElementChild; const reset=document.createElement('button'); reset.textContent='Reset PIN'; reset.onclick=async()=>{ if(!confirm('Clear PIN for '+u.name+'?')) return; await api('/api/users/reset-pin',{method:'POST',body:JSON.stringify({name:u.name})}); alert('PIN cleared. Next login sets a new one.'); renderUsers(); }; act.appendChild(reset); const rn=document.createElement('button'); rn.textContent='Rename'; rn.style.marginLeft='6px'; rn.onclick=async()=>{ const nn=prompt('New name for '+u.name,u.name); if(!nn||nn.trim()===u.name) return; const r=await fetch('/api/users/rename',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldName:u.name,newName:nn.trim()})}); if(!r.ok){ const e=await r.json(); alert(e.error||'Rename failed'); return; } renderUsers(); }; act.appendChild(rn); const rm=document.createElement('button'); rm.textContent='Remove'; rm.style.marginLeft='6px'; rm.onclick=async()=>{ if(!confirm('Delete user '+u.name+'?')) return; await fetch('/api/users',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:u.name})}); renderUsers(); }; act.appendChild(rm); tb.appendChild(tr); }); }
+let weeklyChart; function renderWeekly(){ api('/api/reports/weekly').then(rep=>{ $('#weekRange').textContent='Week: '+new Date(rep.start).toLocaleDateString()+' – '+new Date(rep.end).toLocaleDateString(); const tb=$('#weeklyBody'); tb.innerHTML=''; (rep.rows||[]).forEach(r=>{const tr=document.createElement('tr'); tr.innerHTML='<td>'+r.mechanic+'</td><td>'+r.entries+'</td><td>'+Number(r.hours).toFixed(2)+'</td><td>'+fmtMoney(r.parts)+'</td><td>'+r.risk+'</td>'; tb.appendChild(tr);}); const labels=(rep.rows||[]).map(r=>r.mechanic), hours=(rep.rows||[]).map(r=>Number(r.hours.toFixed(2))), parts=(rep.rows||[]).map(r=>Number(r.parts.toFixed(2))); const ctx=document.getElementById('weeklyChart').getContext('2d'); if(weeklyChart) weeklyChart.destroy(); weeklyChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Hours',data:hours},{label:'Parts $',data:parts}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});}); } $('#weeklyPdfBtn').onclick=()=>window.print();
+const modal=document.createElement('div'); modal.id='detailModal'; Object.assign(modal.style,{display:'none',position:'fixed',inset:'0',background:'rgba(0,0,0,.4)',zIndex:'1000',alignItems:'center',justifyContent:'center'}); modal.innerHTML=`<div class="card" style="max-width:900px;width:92%;max-height:90vh;overflow:auto"><h2>Entry Details</h2><div class="content"><div class="row"><div><label>Start</label><div id="dStart"></div></div><div><label>Finish</label><div id="dEnd"></div></div><div><label>Hours</label><div id="dHours"></div></div></div><div class="row" style="margin-top:8px"><div><label>Bus</label><div id="dBus"></div></div><div><label>Type</label><div id="dType"></div></div><div><label>Mechanic</label><div id="dMech"></div></div></div><div class="row" style="margin-top:8px"><div><label>Odometer</label><div id="dOdo"></div></div><div style="grid-column:span 2"><label>Description</label><div id="dNotes" style="white-space:pre-wrap"></div></div></div><div class="card" style="margin-top:12px"><h2>Parts</h2><div class="content" style="overflow:auto"><table><thead><tr><th>Part #</th><th>Description</th><th>Qty</th><th>Unit $</th><th>Line Total</th></tr></thead><tbody id="dParts"></tbody><tfoot><tr><th colspan="4" style="text-align:right">Grand Total</th><th id="dPartsGrand">$0.00</th></tr></tfoot></table></div></div><div class="actions" style="margin-top:12px"><button id="detailPrint">Print This Entry</button><button id="detailClose">Close</button></div></div></div>`; document.body.appendChild(modal);
+function openDetail(e){ $('#dStart').textContent=e.startTime?new Date(e.startTime).toLocaleString():''; $('#dEnd').textContent=e.endTime?new Date(e.endTime).toLocaleString():''; $('#dHours').textContent=Number(e.durationHours||0).toFixed(2); $('#dBus').textContent=e.bus||''; $('#dType').textContent=e.serviceType||''; $('#dMech').textContent=e.mechanic||''; $('#dOdo').textContent=e.odometer||''; $('#dNotes').textContent=e.notes||''; const tb=$('#dParts'); const gt=$('#dPartsGrand'); tb.innerHTML=''; let g=0; (e.parts||[]).forEach(p=>{const qty=Number(p.qty)||0, unit=Number(p.unit)||0, line=qty*unit; g+=line; const tr=document.createElement('tr'); tr.innerHTML='<td>'+(p.partNo||'')+'</td><td>'+(p.desc||'')+'</td><td>'+qty+'</td><td>'+fmtMoney(unit)+'</td><td>'+fmtMoney(line)+'</td>'; tb.appendChild(tr);}); gt.textContent=fmtMoney(g); modal.style.display='flex'; } document.addEventListener('click',ev=>{ if(ev.target && ev.target.id==='detailClose') modal.style.display='none'; if(ev.target && ev.target.id==='detailPrint') window.print(); }); modal.addEventListener('click',ev=>{ if(ev.target===modal) modal.style.display='none'; });
+</script>
+</body>
+</html>
